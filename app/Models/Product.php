@@ -62,7 +62,7 @@ class Product extends Model
             return asset('storage/'.$this->image);
         }
 
-        return asset('storage/products/'.($this->image ?: 'isi-ulang-air-galon.svg'));
+        return asset('storage/products/'.($this->image ?: 'galon.jpg'));
     }
 
     public function getCategoryAttribute(): string

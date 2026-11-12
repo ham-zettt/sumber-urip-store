@@ -29,10 +29,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->firstOrCreateProduct('Isi Ulang Air Galon', 'galon', 6000, 0, 0, false);
-        $this->firstOrCreateProduct('Galon Kosong Baru', 'pcs', 45000, 20, 5, true);
-        $this->firstOrCreateProduct('Air Galon + Galon (Paket)', 'pcs', 65000, 10, 3, true);
-        $this->firstOrCreateProduct('Segel/Tutup Galon', 'pcs', 2000, 100, 20, true);
+        $this->firstOrCreateProduct('Air Galon Baru', 'pcs', 25000, 15, 5, true);
+        $this->firstOrCreateProduct('Air Galon Isi Ulang Besar', 'galon', 7000, 25, 5, true);
+        $this->firstOrCreateProduct('Air Galon Isi Ulang Kecil', 'galon', 5000, 25, 5, true);
     }
 
     private function firstOrCreateProduct(
