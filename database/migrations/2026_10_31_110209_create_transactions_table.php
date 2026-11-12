@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('invoice_number')->unique();
             $table->unsignedInteger('total');
-            $table->string('payment_method'); // tunai or transfer
+            $table->string('payment_method'); // tunai or qris
             $table->unsignedInteger('paid_amount');
             $table->unsignedInteger('change_amount');
             $table->string('status')->default('selesai'); // selesai or batal

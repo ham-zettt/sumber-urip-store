@@ -1,2 +1,5 @@
 *
 !.gitignore
+!products
+products/*
+!products/isi-ulang-air-galon.svg

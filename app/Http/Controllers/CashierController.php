@@ -30,14 +30,10 @@ class CashierController extends Controller
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'payment_method' => ['required', 'in:tunai,transfer'],
+            'payment_method' => ['required', 'in:tunai,qris'],
             'paid_amount' => ['required', 'integer', 'min:0'],
             'note' => ['nullable', 'string', 'max:255'],
         ]);
-
-        if ($data['payment_method'] === 'transfer') {
-            $data['paid_amount'] = 0;
-        }
 
         try {
             $transaction = $this->processTransaction($data);
@@ -67,7 +63,7 @@ class CashierController extends Controller
     /**
      * @param array{
      *     items: array<array{product_id: int, quantity: int}>,
-     *     payment_method: 'tunai'|'transfer',
+     *     payment_method: 'tunai'|'qris',
      *     paid_amount: int,
      *     note?: string|null
      * } $data

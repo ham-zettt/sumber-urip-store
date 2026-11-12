@@ -18,8 +18,25 @@ class DashboardController extends Controller
         $todayStats = Transaction::query()
             ->whereDate('created_at', $today)
             ->where('status', 'selesai')
-            ->selectRaw('sum(total) as total_revenue, count(*) as transaction_count, sum((select sum(quantity) from transaction_items where transaction_items.transaction_id = transactions.id)) as items_sold')
+            ->selectRaw('sum(total) as total_revenue, count(*) as transaction_count, sum((select coalesce(sum(quantity), 0) from transaction_items where transaction_items.transaction_id = transactions.id)) as items_sold')
             ->first();
+
+        $yesterday = now()->subDay()->toDateString();
+        $yesterdayRevenue = (int) (Transaction::query()
+            ->whereDate('created_at', $yesterday)
+            ->where('status', 'selesai')
+            ->sum('total') ?? 0);
+
+        $monthStats = Transaction::query()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', 'selesai')
+            ->selectRaw('sum(total) as total_revenue, count(*) as transaction_count, sum((select coalesce(sum(quantity), 0) from transaction_items where transaction_items.transaction_id = transactions.id)) as items_sold')
+            ->first();
+
+        $totalBalance = (int) (Transaction::query()
+            ->where('status', 'selesai')
+            ->sum('total') ?? 0);
 
         $lowStockProducts = Product::query()
             ->where('track_stock', true)
@@ -40,7 +57,14 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('dashboard', compact('todayStats', 'lowStockProducts', 'topProducts'));
+        return view('dashboard', compact(
+            'todayStats',
+            'monthStats',
+            'yesterdayRevenue',
+            'totalBalance',
+            'lowStockProducts',
+            'topProducts'
+        ));
     }
 
     public function chart(Request $request): JsonResponse
@@ -51,10 +75,10 @@ class DashboardController extends Controller
         $startDate = now()->subDays($days - 1)->startOfDay();
         $endDate = now()->endOfDay();
 
-        $dailyRevenue = Transaction::query()
+        $dailyStats = Transaction::query()
             ->where('status', 'selesai')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('DATE(created_at) as date, sum(total) as total')
+            ->selectRaw('DATE(created_at) as date, sum(total) as total, count(*) as count, sum((select coalesce(sum(quantity), 0) from transaction_items where transaction_items.transaction_id = transactions.id)) as items')
             ->groupBy('date')
             ->orderBy('date')
             ->get()
@@ -62,15 +86,23 @@ class DashboardController extends Controller
 
         $labels = [];
         $data = [];
+        $counts = [];
+        $items = [];
         for ($i = 0; $i < $days; $i++) {
-            $date = now()->subDays($days - 1 - $i)->format('Y-m-d');
-            $labels[] = now()->subDays($days - 1 - $i)->translatedFormat('d M');
-            $data[] = (int) ($dailyRevenue[$date]?->total ?? 0);
+            $dt = now()->subDays($days - 1 - $i);
+            $date = $dt->format('Y-m-d');
+            $labels[] = $dt->translatedFormat('d M');
+            $data[] = (int) ($dailyStats[$date]?->total ?? 0);
+            $counts[] = (int) ($dailyStats[$date]?->count ?? 0);
+            $items[] = (int) ($dailyStats[$date]?->items ?? 0);
         }
 
         return response()->json([
             'labels' => $labels,
             'data' => $data,
+            'revenue' => $data,
+            'counts' => $counts,
+            'items' => $items,
         ]);
     }
 }
