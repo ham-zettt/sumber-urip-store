@@ -3,3 +3,7 @@
 !products
 products/*
 !products/isi-ulang-air-galon.svg
+!products/galon.jpg
+!qris
+qris/*
+!qris/qris-code.png

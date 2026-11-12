@@ -198,7 +198,7 @@
                                         :src="product.image_url"
                                         :alt="product.name"
                                         class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-xs"
-                                        onerror="this.src='/storage/products/galon.jpg'"
+                                        onerror="this.onerror=null;this.src='/storage/products/isi-ulang-air-galon.svg'"
                                     >
 
                                     <!-- Unit Badge -->
@@ -316,7 +316,7 @@
                                         :src="item.image_url"
                                         :alt="item.name"
                                         class="w-full h-full object-contain"
-                                        onerror="this.src='/storage/products/galon.jpg'"
+                                        onerror="this.onerror=null;this.src='/storage/products/isi-ulang-air-galon.svg'"
                                     >
                                 </div>
 
