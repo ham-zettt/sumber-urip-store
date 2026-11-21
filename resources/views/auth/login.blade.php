@@ -57,7 +57,7 @@
     <div class="w-full max-w-md">
         <div class="flex flex-col items-center mb-8">
             <div class="w-12 h-12 rounded-xl bg-surface-1 border border-hairline flex items-center justify-center mb-4">
-                <div class="w-5 h-5 rounded-full bg-primary"></div>
+                <img src="{{ asset('storage/logo.png') }}" alt="Sumber Urip">
             </div>
             <h1 class="text-2xl font-semibold tracking-tight text-ink">Toko Sumber Urip</h1>
             <p class="text-sm text-ink-subtle mt-1">Masuk untuk mulai mencatat penjualan</p>
