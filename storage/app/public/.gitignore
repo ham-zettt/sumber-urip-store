@@ -7,3 +7,4 @@ products/*
 !qris
 qris/*
 !qris/qris-code.png
+!logo.png
