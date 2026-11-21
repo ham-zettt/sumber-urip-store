@@ -9,6 +9,7 @@ use App\Models\TransactionItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -33,6 +34,8 @@ class CashierController extends Controller
             'payment_method' => ['required', 'in:tunai,qris'],
             'paid_amount' => ['required', 'integer', 'min:0'],
             'note' => ['nullable', 'string', 'max:255'],
+            'is_custom_date' => ['nullable', 'boolean'],
+            'transaction_date' => ['nullable', 'required_if:is_custom_date,true', 'date', 'before_or_equal:today'],
         ]);
 
         try {
@@ -65,7 +68,9 @@ class CashierController extends Controller
      *     items: array<array{product_id: int, quantity: int}>,
      *     payment_method: 'tunai'|'qris',
      *     paid_amount: int,
-     *     note?: string|null
+     *     note?: string|null,
+     *     is_custom_date?: bool|null,
+     *     transaction_date?: string|null
      * } $data
      */
     private function processTransaction(array $data): Transaction
@@ -115,9 +120,14 @@ class CashierController extends Controller
                 $changeAmount = $data['paid_amount'] - $total;
             }
 
-            $invoiceNumber = $this->generateInvoiceNumber();
+            $isCustomDate = ! empty($data['is_custom_date']) && ! empty($data['transaction_date']);
+            $txDate = $isCustomDate
+                ? Carbon::parse($data['transaction_date'])->setTime(now()->hour, now()->minute, now()->second)
+                : now();
 
-            $transaction = Transaction::create([
+            $invoiceNumber = $this->generateInvoiceNumber($txDate);
+
+            $transaction = new Transaction([
                 'invoice_number' => $invoiceNumber,
                 'total' => $total,
                 'payment_method' => $data['payment_method'],
@@ -127,19 +137,36 @@ class CashierController extends Controller
                 'note' => $data['note'] ?? null,
             ]);
 
+            if ($isCustomDate) {
+                $transaction->created_at = $txDate;
+                $transaction->updated_at = $txDate;
+            }
+
+            $transaction->save();
+
             foreach ($itemsToSave as $itemData) {
-                $item = TransactionItem::create(array_merge($itemData, ['transaction_id' => $transaction->id]));
+                $item = new TransactionItem(array_merge($itemData, ['transaction_id' => $transaction->id]));
+                if ($isCustomDate) {
+                    $item->created_at = $txDate;
+                    $item->updated_at = $txDate;
+                }
+                $item->save();
 
                 $product = $products[$itemData['product_id']];
                 if ($product->track_stock) {
-                    StockMovement::create([
+                    $movement = new StockMovement([
                         'product_id' => $product->id,
                         'type' => 'keluar',
                         'quantity' => $itemData['quantity'],
                         'note' => "Transaksi {$invoiceNumber}",
                         'transaction_id' => $transaction->id,
-                        'movement_date' => now()->toDateString(),
+                        'movement_date' => $txDate->toDateString(),
                     ]);
+                    if ($isCustomDate) {
+                        $movement->created_at = $txDate;
+                        $movement->updated_at = $txDate;
+                    }
+                    $movement->save();
                 }
             }
 
@@ -147,9 +174,9 @@ class CashierController extends Controller
         });
     }
 
-    private function generateInvoiceNumber(): string
+    private function generateInvoiceNumber(?Carbon $date = null): string
     {
-        $datePart = now()->format('Ymd');
+        $datePart = ($date ?? now())->format('Ymd');
         $prefix = "INV-{$datePart}-";
 
         $lastNumber = Transaction::where('invoice_number', 'like', "{$prefix}%")
@@ -162,6 +189,6 @@ class CashierController extends Controller
             $sequence = $lastSequence + 1;
         }
 
-        return $prefix.str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
     }
 }

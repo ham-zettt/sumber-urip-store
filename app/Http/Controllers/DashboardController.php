@@ -11,28 +11,31 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $today = now()->toDateString();
+        $period = in_array($request->input('period'), ['today', 'week', 'month'], true) ? $request->input('period') : 'today';
+        $periodStart = match ($period) {
+            'week' => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            default => now()->startOfDay(),
+        };
+        $periodLabel = match ($period) {
+            'week' => 'Minggu Ini',
+            'month' => 'Bulan Ini',
+            default => 'Hari Ini',
+        };
 
-        $todayStats = Transaction::query()
-            ->whereDate('created_at', $today)
+        $stats = Transaction::query()
+            ->whereBetween('created_at', [$periodStart, now()])
             ->where('status', 'selesai')
             ->selectRaw('sum(total) as total_revenue, count(*) as transaction_count, sum((select coalesce(sum(quantity), 0) from transaction_items where transaction_items.transaction_id = transactions.id)) as items_sold')
             ->first();
 
-        $yesterday = now()->subDay()->toDateString();
-        $yesterdayRevenue = (int) (Transaction::query()
-            ->whereDate('created_at', $yesterday)
-            ->where('status', 'selesai')
-            ->sum('total') ?? 0);
-
-        $monthStats = Transaction::query()
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->where('status', 'selesai')
-            ->selectRaw('sum(total) as total_revenue, count(*) as transaction_count, sum((select coalesce(sum(quantity), 0) from transaction_items where transaction_items.transaction_id = transactions.id)) as items_sold')
-            ->first();
+        $latestTransactions = Transaction::query()
+            ->withSum('items', 'quantity')
+            ->latest('created_at')
+            ->limit(3)
+            ->get();
 
         $totalBalance = (int) (Transaction::query()
             ->where('status', 'selesai')
@@ -58,12 +61,13 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard', compact(
-            'todayStats',
-            'monthStats',
-            'yesterdayRevenue',
+            'stats',
+            'period',
+            'periodLabel',
             'totalBalance',
             'lowStockProducts',
-            'topProducts'
+            'topProducts',
+            'latestTransactions'
         ));
     }
 

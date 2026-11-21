@@ -103,9 +103,9 @@
             <!-- Desktop sidebar -->
             <aside class="hidden md:flex w-64 bg-surface-1 border-r border-hairline flex-col shrink-0">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 p-5 border-b border-hairline">
-                    <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-on-primary font-bold text-sm shadow-xs">
-                        SU
-                    </div>
+                    <img src="{{ asset('storage/logo.png') }}" class="w-9 h-9 rounded-xl flex items-center justify-center text-on-primary font-bold text-sm shadow-xs">
+                        
+                    
                     <div>
                         <span class="text-base font-bold text-ink tracking-tight block">Sumber Urip</span>
                         <span class="text-xs text-ink-subtle block">Depo Air & POS Hub</span>

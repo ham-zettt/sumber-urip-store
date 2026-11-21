@@ -9,54 +9,7 @@
             <h1 class="text-2xl font-bold tracking-tight text-ink">Dashboard</h1>
             <p class="text-xs sm:text-sm text-ink-subtle mt-0.5">Ringkasan aktivitas penjualan & performa toko Sumber Urip.</p>
         </div>
-        <div class="flex items-center gap-2.5">
-            <div x-data="{ openFilter: false }" class="relative">
-                <button
-                    type="button"
-                    @click="openFilter = !openFilter"
-                    class="inline-flex items-center gap-2 bg-surface-1 hover:bg-surface-2 border border-hairline text-ink font-medium text-xs sm:text-sm rounded-xl px-3.5 py-2.5 min-h-[42px] transition-colors cursor-pointer"
-                >
-                    <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                    </svg>
-                    <span>Filter</span>
-                </button>
-                <div
-                    x-show="openFilter"
-                    @click.outside="openFilter = false"
-                    x-transition
-                    class="absolute right-0 mt-2 w-48 bg-surface-1 border border-hairline rounded-xl shadow-lg p-2 z-30 text-xs"
-                >
-                    <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-lg hover:bg-surface-2 text-ink font-medium">Hari Ini</a>
-                    <a href="{{ route('transaksi.index') }}" class="block px-3 py-2 rounded-lg hover:bg-surface-2 text-ink font-medium">Semua Transaksi</a>
-                    <a href="{{ route('stok.index') }}" class="block px-3 py-2 rounded-lg hover:bg-surface-2 text-ink font-medium">Riwayat Stok</a>
-                </div>
-            </div>
 
-            <a
-                href="{{ route('kasir.index') }}"
-                class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-on-primary font-semibold text-xs sm:text-sm rounded-xl px-4 py-2.5 min-h-[42px] shadow-xs transition-colors cursor-pointer"
-            >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span>Buka Kasir</span>
-            </a>
-
-            <a
-                href="{{ route('produk.create') }}"
-                class="inline-flex items-center gap-2 bg-surface-1 hover:bg-surface-2 border border-hairline text-ink font-semibold text-xs sm:text-sm rounded-xl px-3.5 py-2.5 min-h-[42px] transition-colors cursor-pointer"
-                title="Tambah Produk Baru"
-            >
-                <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                </svg>
-                <span class="hidden sm:inline">Tambah Produk</span>
-            </a>
-        </div>
     </div>
 
     <!-- Top Cards Row (Total Balance + Statistics, matching Image 0) -->
@@ -71,7 +24,7 @@
                     </span>
                 </div>
                 <div class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight mt-2">
-                    Rp {{ number_format($totalBalance > 0 ? $totalBalance : ($todayStats->total_revenue ?? 0), 0, ',', '.') }}
+                    Rp {{ number_format($totalBalance > 0 ? $totalBalance : ($stats->total_revenue ?? 0), 0, ',', '.') }}
                 </div>
                 <p class="text-[11px] text-ink-subtle mt-0.5">
                     Pembaruan terakhir: {{ now()->translatedFormat('H:i') }} WIB
@@ -111,29 +64,56 @@
             <div class="flex items-center justify-between pb-3 border-b border-hairline/80">
                 <div>
                     <h2 class="text-sm sm:text-base font-bold text-ink">Statistik Toko</h2>
-                    <p class="text-[11px] text-ink-subtle">Performa transaksi & penjualan harian</p>
+                    <p class="text-[11px] text-ink-subtle">Performa transaksi & penjualan {{ strtolower($periodLabel) }}</p>
                 </div>
-                <div class="inline-flex items-center gap-1.5 bg-surface-2 border border-hairline px-3 py-1.5 rounded-xl text-xs font-medium text-ink">
-                    <span>Hari Ini</span>
-                    <svg class="w-3.5 h-3.5 text-ink-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                <div x-data="{ openPeriod: false }" class="relative">
+                    <button
+                        type="button"
+                        @click="openPeriod = !openPeriod"
+                        class="inline-flex items-center gap-1.5 bg-surface-2 hover:bg-surface-1 border border-hairline px-3 py-1.5 rounded-xl text-xs font-medium text-ink cursor-pointer transition-colors"
+                    >
+                        <span>{{ $periodLabel }}</span>
+                        <svg class="w-3.5 h-3.5 text-ink-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div
+                        x-show="openPeriod"
+                        x-cloak
+                        @click.outside="openPeriod = false"
+                        x-transition
+                        class="absolute right-0 mt-2 w-36 bg-surface-1 border border-hairline rounded-xl shadow-lg p-1.5 z-30 text-xs"
+                    >
+                        @foreach (['today' => 'Hari Ini', 'week' => 'Minggu Ini', 'month' => 'Bulan Ini'] as $value => $label)
+                            <a
+                                href="{{ route('dashboard', ['period' => $value]) }}"
+                                class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-surface-2 {{ $period === $value ? 'text-primary font-semibold' : 'text-ink font-medium' }}"
+                            >
+                                <span>{{ $label }}</span>
+                                @if ($period === $value)
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                @endif
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                 <!-- Col 1: Total Earnings -->
                 <div class="sm:border-r sm:border-hairline/60 sm:pr-4">
-                    <span class="text-xs font-medium text-ink-subtle block">Pendapatan Hari Ini</span>
+                    <span class="text-xs font-medium text-ink-subtle block">Pendapatan {{ $periodLabel }}</span>
                     <div class="text-lg sm:text-xl font-bold text-ink mt-1 tracking-tight">
-                        Rp {{ number_format($todayStats->total_revenue ?? 0, 0, ',', '.') }}
+                        Rp {{ number_format($stats->total_revenue ?? 0, 0, ',', '.') }}
                     </div>
                     <div class="flex items-center gap-1 text-xs font-semibold text-success mt-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                             <line x1="7" y1="17" x2="17" y2="7"></line>
                             <polyline points="7 7 17 7 17 17"></polyline>
                         </svg>
-                        <span>+{{ $todayStats->total_revenue > 0 ? '18.4%' : '0%' }}</span>
+                        <span>+{{ $stats->total_revenue > 0 ? '18.4%' : '0%' }}</span>
                     </div>
                 </div>
 
@@ -141,13 +121,13 @@
                 <div class="sm:border-r sm:border-hairline/60 sm:px-2">
                     <span class="text-xs font-medium text-ink-subtle block">Jumlah Transaksi</span>
                     <div class="text-lg sm:text-xl font-bold text-ink mt-1 tracking-tight">
-                        {{ number_format($todayStats->transaction_count ?? 0, 0, ',', '.') }}
+                        {{ number_format($stats->transaction_count ?? 0, 0, ',', '.') }}
                     </div>
                     <div class="flex items-center gap-1 text-xs font-semibold text-primary mt-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        <span>{{ $todayStats->transaction_count > 0 ? 'Selesai' : 'Siap Kasir' }}</span>
+                        <span>{{ $stats->transaction_count > 0 ? 'Selesai' : 'Siap Kasir' }}</span>
                     </div>
                 </div>
 
@@ -155,21 +135,21 @@
                 <div class="sm:pl-2">
                     <span class="text-xs font-medium text-ink-subtle block">Total Item Terjual</span>
                     <div class="text-lg sm:text-xl font-bold text-ink mt-1 tracking-tight">
-                        {{ number_format($todayStats->items_sold ?? 0, 0, ',', '.') }} <span class="text-xs font-normal text-ink-subtle">item</span>
+                        {{ number_format($stats->items_sold ?? 0, 0, ',', '.') }} <span class="text-xs font-normal text-ink-subtle">item</span>
                     </div>
                     <div class="flex items-center gap-1 text-xs font-semibold text-success mt-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                             <line x1="7" y1="17" x2="17" y2="7"></line>
                             <polyline points="7 7 17 7 17 17"></polyline>
                         </svg>
-                        <span>+{{ $todayStats->items_sold > 0 ? '8.3%' : '0%' }}</span>
+                        <span>+{{ $stats->items_sold > 0 ? '8.3%' : '0%' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Second Row (Purchase Activity Chart + Popular Tags, matching Image 0) -->
+    <!-- Second Row (Purchase Activity Chart + Latest Transactions, matching Image 0) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
         <!-- Purchase Activity Chart (Image 0 Left Main Chart) -->
         <div x-data="salesChartComponent()" class="lg:col-span-8 bg-surface-1 border border-hairline rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between">
@@ -242,55 +222,43 @@
             </div>
         </div>
 
-        <!-- Popular Tags & Low Stock Alerts (Image 0 Right Side Widget) -->
+        <!-- Latest Transactions & Low Stock Alerts (Image 0 Right Side Widget) -->
         <div class="lg:col-span-4 space-y-5">
-            <!-- Popular Tags Card (Image 0 style) -->
+            <!-- Latest Transactions Card -->
             <div class="bg-surface-1 border border-hairline rounded-2xl p-5 shadow-xs">
                 <div class="flex items-center justify-between mb-3.5">
                     <div class="flex items-center gap-2">
                         <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            <path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2V2z"></path>
+                            <line x1="8" y1="7" x2="16" y2="7"></line>
+                            <line x1="8" y1="11" x2="16" y2="11"></line>
                         </svg>
-                        <h2 class="text-sm font-bold text-ink">Tag & Kategori Populer</h2>
+                        <h2 class="text-sm font-bold text-ink">Transaksi Terbaru</h2>
                     </div>
-                    <button type="button" class="text-ink-subtle hover:text-ink w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-2 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <circle cx="12" cy="12" r="1"></circle>
-                            <circle cx="19" cy="12" r="1"></circle>
-                            <circle cx="5" cy="12" r="1"></circle>
-                        </svg>
-                    </button>
+                    <a href="{{ route('transaksi.index') }}" class="text-[11px] font-semibold text-primary hover:underline">Lihat Semua</a>
                 </div>
 
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('kasir.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #isi-ulang
-                    </a>
-                    <a href="{{ route('kasir.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #air-galon
-                    </a>
-                    <a href="{{ route('kasir.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #galon-baru
-                    </a>
-                    <a href="{{ route('kasir.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #paket-hemat
-                    </a>
-                    <a href="{{ route('kasir.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #tutup-segel
-                    </a>
-                    <a href="{{ route('transaksi.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #tunai
-                    </a>
-                    <a href="{{ route('transaksi.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #transfer
-                    </a>
-                    <a href="{{ route('transaksi.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #qris
-                    </a>
-                    <a href="{{ route('produk.index') }}" class="text-xs font-medium px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-primary hover:text-on-primary border border-hairline hover:border-primary text-ink-muted transition-all duration-150 cursor-pointer">
-                        #depo-air
-                    </a>
+                <div class="space-y-2.5 text-xs">
+                    @forelse ($latestTransactions as $transaction)
+                        <a href="{{ route('transaksi.show', $transaction) }}" class="flex items-center justify-between gap-3 p-3 rounded-xl bg-surface-2/80 border border-hairline hover:border-primary/40 transition-colors">
+                            <div class="min-w-0 flex-1">
+                                <span class="font-mono text-[11px] font-semibold text-ink truncate block">{{ $transaction->invoice_number }}</span>
+                                <span class="text-[11px] text-ink-subtle">
+                                    {{ $transaction->created_at->translatedFormat('d M, H:i') }} · {{ (int) $transaction->items_sum_quantity }} item
+                                </span>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="block font-semibold text-ink">Rp {{ number_format($transaction->total, 0, ',', '.') }}</span>
+                                <span class="inline-flex text-[10px] px-1.5 py-0.5 rounded-full mt-0.5 {{ $transaction->status === 'selesai' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger' }}">
+                                    {{ $transaction->status }}
+                                </span>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="text-center py-4 text-ink-subtle text-xs">
+                            Belum ada transaksi.
+                        </div>
+                    @endforelse
                 </div>
             </div>
 

@@ -107,3 +107,36 @@ it('rejects checkout when cash paid is less than total', function () {
     expect(Transaction::count())->toBe(0);
     expect($product->fresh()->stock)->toBe(10);
 });
+
+it('can record a backdated transaction with custom date', function () {
+    actingAsCashier();
+
+    $product = Product::factory()->create([
+        'name' => 'Galon Baru',
+        'price' => 50000,
+        'stock' => 10,
+        'track_stock' => true,
+    ]);
+
+    $pastDate = '2024-05-15';
+
+    $response = $this->postJson(route('kasir.store'), [
+        'items' => [['product_id' => $product->id, 'quantity' => 2]],
+        'payment_method' => 'tunai',
+        'paid_amount' => 100000,
+        'is_custom_date' => true,
+        'transaction_date' => $pastDate,
+    ]);
+
+    $response->assertOk();
+
+    $transaction = Transaction::first();
+    expect($transaction)->not->toBeNull();
+    expect($transaction->invoice_number)->toStartWith('INV-20240515-');
+    expect($transaction->created_at->toDateString())->toBe($pastDate);
+
+    $movement = StockMovement::where('transaction_id', $transaction->id)->first();
+    expect($movement)->not->toBeNull();
+    expect($movement->movement_date->toDateString())->toBe($pastDate);
+    expect($movement->created_at->toDateString())->toBe($pastDate);
+});

@@ -58,18 +58,6 @@
                 <h1 class="text-2xl font-bold tracking-tight text-ink">Kasir Penjualan</h1>
                 <p class="text-xs sm:text-sm text-ink-subtle mt-0.5">Workstation kasir cepat — pilih produk, kelola keranjang, dan proses pembayaran.</p>
             </div>
-            <div class="flex items-center gap-2">
-                <a
-                    href="{{ route('transaksi.index') }}"
-                    class="inline-flex items-center gap-2 bg-surface-1 hover:bg-surface-2 border border-hairline text-ink font-semibold text-xs sm:text-sm rounded-xl px-4 py-2.5 min-h-[42px] transition-colors shadow-xs focus-ring cursor-pointer"
-                >
-                    <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                        <line x1="2" y1="10" x2="22" y2="10"></line>
-                    </svg>
-                    <span>Riwayat Transaksi</span>
-                </a>
-            </div>
         </div>
 
         <!-- Main Layout (Left: Categories + Products, Right: Current Orders Cart) -->
@@ -281,37 +269,37 @@
 
             <!-- Right Panel: Current Orders Cart & Natural Tender Pipeline -->
             <div class="lg:col-span-5 xl:col-span-4 sticky top-6">
-                <div class="bg-surface-1 border border-hairline rounded-2xl p-4 sm:p-5 lg:pb-0 shadow-xs flex flex-col lg:max-h-[calc(100vh_-_176px)] lg:overflow-y-auto scrollbar-thin">
+                <div class="bg-surface-1 border border-hairline rounded-3xl p-4 sm:p-5 lg:pb-0 shadow-xs flex flex-col lg:max-h-[calc(100vh_-_176px)] lg:overflow-y-auto scrollbar-thin">
                     <!-- Cart Header -->
-                    <div class="flex items-center justify-between pb-3 border-b border-hairline shrink-0">
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-base font-bold text-ink">Pesanan Saat Ini</h2>
-                            <span class="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20" x-text="cartTotalItems + ' item'"></span>
+                    <div class="flex items-center justify-between pb-3.5 border-b border-hairline shrink-0">
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-base sm:text-lg font-bold text-ink">Detail Transaksi</h2>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-surface-2 text-ink-subtle border border-hairline" x-text="cartTotalItems + ' item'"></span>
                         </div>
 
-                        <!-- Kosongkan Keranjang -->
+                        <!-- Reset Order Button (Layout sesuai gambar referensi) -->
                         <button
                             x-show="cartItems.length > 0"
                             @click="clearCart()"
                             type="button"
-                            class="text-xs text-ink-subtle hover:text-danger flex items-center gap-1.5 px-2.5 min-h-[36px] rounded-lg hover:bg-danger/10 transition-colors focus-ring cursor-pointer"
-                            title="Kosongkan Keranjang"
-                            aria-label="Kosongkan keranjang"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-hairline bg-surface-1 hover:bg-surface-2 text-xs font-semibold text-ink transition-colors focus-ring cursor-pointer shadow-2xs"
+                            title="Reset Order"
+                            aria-label="Reset order keranjang"
                         >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <svg class="w-3.5 h-3.5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>
                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
-                            <span>Kosongkan</span>
+                            <span>Reset Order</span>
                         </button>
                     </div>
 
-                    <!-- Cart Items List -->
-                    <div class="overflow-y-auto space-y-2 py-3 max-h-[280px] pr-1 scrollbar-thin shrink-0">
+                    <!-- Cart Items List (Layout item sesuai gambar referensi) -->
+                    <div class="overflow-y-auto space-y-3 py-3 max-h-[340px] pr-1 scrollbar-thin shrink-0">
                         <template x-for="(item, index) in cartItems" :key="item.product_id">
-                            <div class="p-2 rounded-xl bg-surface-2/70 border border-hairline hover:border-hairline-strong flex items-center gap-2.5 transition-colors">
+                            <div class="bg-surface-2/60 border border-hairline rounded-2xl p-3 sm:p-3.5 flex items-center gap-3 transition-colors hover:border-hairline-strong">
                                 <!-- Thumbnail Image -->
-                                <div class="w-10 h-10 rounded-lg bg-surface-1 border border-hairline p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                                <div class="w-20 h-20 sm:w-22 sm:h-22 rounded-2xl bg-surface-1 border border-hairline/60 p-2 shrink-0 flex items-center justify-center overflow-hidden">
                                     <img
                                         :src="item.image_url"
                                         :alt="item.name"
@@ -320,48 +308,70 @@
                                     >
                                 </div>
 
-                                <!-- Item Info -->
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="text-xs font-bold text-ink truncate" x-text="item.name"></h4>
-                                    <p class="text-xs font-mono text-ink-subtle" x-text="formatMoney(item.price)"></p>
-                                </div>
+                                <!-- Item Details -->
+                                <div class="flex-1 min-w-0 flex flex-col justify-between self-stretch py-0.5">
+                                    <!-- Row 1: Title and Delete Button -->
+                                    <div class="flex items-start justify-between gap-2">
+                                        <h4 class="text-xs sm:text-sm font-bold text-ink truncate pr-1" x-text="item.name"></h4>
+                                        <button
+                                            type="button"
+                                            @click="removeItem(index)"
+                                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-danger text-white hover:bg-danger/90 active:scale-95 flex items-center justify-center shrink-0 transition-transform cursor-pointer shadow-xs"
+                                            title="Hapus produk"
+                                            aria-label="Hapus produk dari pesanan"
+                                        >
+                                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
 
-                                <!-- Stepper Buttons with Min 40px Touch Target -->
-                                <div class="flex items-center gap-1 shrink-0 bg-surface-1 border border-hairline rounded-lg p-0.5">
-                                    <button
-                                        type="button"
-                                        @click="updateQty(index, item.qty - 1)"
-                                        class="min-w-[40px] min-h-[40px] w-10 h-10 rounded-md hover:bg-surface-3 text-ink flex items-center justify-center text-base font-bold transition-colors focus-ring cursor-pointer"
-                                        title="Kurangi"
-                                        aria-label="Kurangi jumlah"
-                                    >−</button>
-                                    <span class="w-7 text-center text-xs font-mono font-bold text-ink" x-text="item.qty"></span>
-                                    <button
-                                        type="button"
-                                        @click="updateQty(index, item.qty + 1)"
-                                        class="min-w-[40px] min-h-[40px] w-10 h-10 rounded-md hover:bg-surface-3 text-ink flex items-center justify-center text-base font-bold transition-colors focus-ring cursor-pointer"
-                                        title="Tambah"
-                                        aria-label="Tambah jumlah"
-                                    >+</button>
-                                </div>
+                                    <!-- Row 2: Attributes Pills -->
+                                    <div class="flex items-center gap-2 my-1">
+                                        <span class="text-[11px] text-ink-subtle bg-surface-1 px-2.5 py-0.5 rounded-full border border-hairline" x-text="item.unit || 'pcs'"></span>
+                                        <span class="text-[11px] text-ink-subtle flex items-center gap-1.5">
+                                            <span class="w-1 h-1 rounded-full bg-ink-subtle"></span>
+                                            <span x-text="formatMoney(item.price)"></span>
+                                        </span>
+                                    </div>
 
-                                <!-- Subtotal & Remove -->
-                                <div class="text-right shrink-0 min-w-[70px]">
-                                    <span class="text-xs font-mono font-bold text-ink block" x-text="formatMoney(item.price * item.qty)"></span>
-                                    <button
-                                        type="button"
-                                        @click="removeItem(index)"
-                                        class="text-xs text-danger hover:underline p-1.5 -m-1 rounded focus-ring cursor-pointer"
-                                    >Hapus</button>
+                                    <!-- Row 3: Stepper & Total -->
+                                    <div class="flex items-center justify-between mt-auto pt-1">
+                                        <!-- Stepper -->
+                                        <div class="inline-flex items-center gap-2 bg-surface-1 border border-hairline rounded-full px-2 py-1">
+                                            <button
+                                                type="button"
+                                                @click="updateQty(index, item.qty - 1)"
+                                                class="w-6 h-6 rounded-full hover:bg-surface-3 text-ink flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+                                                title="Kurangi"
+                                                aria-label="Kurangi jumlah"
+                                            >−</button>
+                                            <span class="w-6 text-center text-xs font-bold text-ink" x-text="String(item.qty).padStart(2, '0')"></span>
+                                            <button
+                                                type="button"
+                                                @click="updateQty(index, item.qty + 1)"
+                                                class="w-6 h-6 rounded-full bg-primary text-white hover:brightness-105 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer shadow-2xs"
+                                                title="Tambah"
+                                                aria-label="Tambah jumlah"
+                                            >+</button>
+                                        </div>
+
+                                        <!-- Item Total (Font Global - Bukan Mono) -->
+                                        <div class="text-right">
+                                            <span class="text-xs text-ink-subtle mr-1.5">Total</span>
+                                            <span class="text-xs sm:text-sm font-bold text-ink" x-text="formatMoney(item.price * item.qty)"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </template>
 
                         <!-- Empty Cart State -->
                         <template x-if="cartItems.length === 0">
-                            <div class="flex flex-col items-center justify-center py-8 text-center text-ink-subtle">
-                                <div class="w-12 h-12 rounded-xl bg-surface-2 border border-hairline flex items-center justify-center text-ink-subtle mb-2.5">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                            <div class="flex flex-col items-center justify-center py-10 text-center text-ink-subtle">
+                                <div class="w-14 h-14 rounded-2xl bg-surface-2 border border-hairline flex items-center justify-center text-ink-subtle mb-3">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                         <circle cx="9" cy="21" r="1"></circle>
                                         <circle cx="20" cy="21" r="1"></circle>
                                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -374,137 +384,154 @@
                     </div>
 
                     <!-- NATURAL TENDER & CHECKOUT SEQUENCE -->
-                    <div class="border-t border-hairline pt-3 space-y-3 mt-1 shrink-0">
-                        <!-- STEP 1: BILL SUMMARY (Single Prominent Total) -->
-                        <div class="px-3.5 py-2.5 rounded-xl bg-surface-2/80 border border-hairline flex items-end justify-between gap-3">
-                            <div class="pb-0.5">
-                                <span class="text-xs uppercase tracking-wider font-bold text-ink-subtle block">Total Tagihan</span>
-                                <span class="text-xs text-ink-subtle mt-0.5 block" x-text="cartTotalItems + ' barang'"></span>
-                            </div>
-                            <span class="text-2xl sm:text-3xl font-mono font-black text-ink tracking-tight leading-none" x-text="formatMoney(total)"></span>
-                        </div>
-
-                        <!-- STEP 2: PAYMENT METHOD -->
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-ink-subtle block mb-1.5">Metode Pembayaran</label>
-                            <div class="grid grid-cols-2 gap-1.5 bg-surface-2 p-1 rounded-xl border border-hairline">
+                    <div class="border-t border-hairline pt-3.5 space-y-3 mt-1 shrink-0">
+                        <!-- FITUR TRANSAKSI LAWAS (TOGGLE SWITCH) -->
+                        <div class="bg-surface-2/60 border border-hairline rounded-2xl p-3 sm:p-3.5 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-surface-1 border border-hairline flex items-center justify-center text-ink-subtle">
+                                        <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-bold text-ink block">Transaksi Lawas</span>
+                                        <span class="text-[11px] text-ink-subtle block">Input data untuk transaksi tanggal lampau</span>
+                                    </div>
+                                </div>
+                                <!-- Toggle Switch -->
                                 <button
                                     type="button"
-                                    @click="setPaymentMethod('tunai')"
-                                    :aria-pressed="paymentMethod === 'tunai'"
-                                    :class="paymentMethod === 'tunai' ? 'bg-surface-1 text-primary shadow-xs font-bold' : 'text-ink-subtle hover:text-ink font-medium'"
-                                    class="py-2 text-xs rounded-lg transition-all text-center focus-ring cursor-pointer min-h-[40px] flex items-center justify-center gap-1.5"
+                                    @click="toggleCustomDate()"
+                                    role="switch"
+                                    :aria-checked="isCustomDate"
+                                    :class="isCustomDate ? 'bg-primary' : 'bg-surface-3'"
+                                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-ring"
+                                    title="Aktifkan transaksi lawas"
+                                    aria-label="Toggle transaksi lawas"
                                 >
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                                        <circle cx="12" cy="12" r="2"></circle>
-                                    </svg>
-                                    <span>Tunai</span>
+                                    <span
+                                        :class="isCustomDate ? 'translate-x-5 bg-white' : 'translate-x-0 bg-ink-subtle'"
+                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-md ring-0 transition duration-200 ease-in-out"
+                                    ></span>
                                 </button>
-                                <button
-                                    type="button"
-                                    @click="setPaymentMethod('qris')"
-                                    :aria-pressed="paymentMethod === 'qris'"
-                                    :class="paymentMethod === 'qris' ? 'bg-surface-1 text-primary shadow-xs font-bold' : 'text-ink-subtle hover:text-ink font-medium'"
-                                    class="py-2 text-xs rounded-lg transition-all text-center focus-ring cursor-pointer min-h-[40px] flex items-center justify-center gap-1.5"
+                            </div>
+
+                            <!-- Date selector when toggle is active -->
+                            <div x-show="isCustomDate" x-transition.opacity.duration.200ms class="pt-2 border-t border-hairline space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label for="custom-tx-date" class="block text-xs font-semibold text-ink">
+                                        Pilih Tanggal Transaksi
+                                    </label>
+                                    <span class="text-[11px] text-primary font-medium" x-text="formatSelectedDate(customDate)"></span>
+                                </div>
+                                <input
+                                    id="custom-tx-date"
+                                    type="date"
+                                    x-model="customDate"
+                                    :max="todayDate"
+                                    class="w-full bg-surface-1 border border-hairline rounded-xl px-3 py-2 text-xs text-ink focus:outline-none focus:border-primary cursor-pointer font-sans"
                                 >
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                    <span>QRIS</span>
-                                </button>
+                                <p class="text-[11px] text-ink-subtle leading-tight">
+                                    * Transaksi dan pergerakan stok akan tercatat sesuai tanggal yang dipilih.
+                                </p>
                             </div>
                         </div>
 
-                        <!-- STEP 3: CASH TENDER & HIGH-CONTRAST KEMBALIAN (When Tunai) -->
-                        <template x-if="paymentMethod === 'tunai'">
-                            <div class="space-y-3 bg-surface-2/60 p-3 rounded-xl border border-hairline">
-                                <div class="flex items-center justify-between gap-2">
-                                    <label class="text-xs font-bold text-ink-subtle" for="uang-diterima">Uang Diterima</label>
+                        <!-- METODE PEMBAYARAN -->
+                        <div class="bg-surface-2/60 border border-hairline rounded-2xl p-3 sm:p-3.5 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-ink">Metode Pembayaran</span>
+                                <div class="flex items-center gap-1 bg-surface-1 p-1 rounded-xl border border-hairline">
                                     <button
                                         type="button"
-                                        @click="paidAmount = total"
-                                        class="bg-surface-1 hover:bg-surface-3 border border-hairline text-primary hover:text-primary-hover text-xs font-bold px-3 min-h-[36px] rounded-lg transition-colors focus-ring cursor-pointer"
-                                    >Uang Pas</button>
-                                </div>
-
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-ink-subtle">Rp</span>
-                                    <input
-                                        id="uang-diterima"
-                                        type="number"
-                                        inputmode="numeric"
-                                        x-ref="cashInput"
-                                        x-model.number="paidAmount"
-                                        min="0"
-                                        placeholder="0"
-                                        aria-label="Nominal uang diterima"
-                                        class="w-full min-h-[44px] bg-surface-1 border border-hairline rounded-xl pl-9 pr-3 py-2.5 text-base font-mono font-bold text-ink focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+                                        @click="setPaymentMethod('tunai')"
+                                        :aria-pressed="paymentMethod === 'tunai'"
+                                        :class="paymentMethod === 'tunai' ? 'bg-primary text-on-primary font-bold shadow-2xs' : 'text-ink-subtle hover:text-ink font-medium'"
+                                        class="px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
                                     >
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                                            <circle cx="12" cy="12" r="2"></circle>
+                                        </svg>
+                                        <span>Tunai</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="setPaymentMethod('qris')"
+                                        :aria-pressed="paymentMethod === 'qris'"
+                                        :class="paymentMethod === 'qris' ? 'bg-primary text-on-primary font-bold shadow-2xs' : 'text-ink-subtle hover:text-ink font-medium'"
+                                        class="px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+                                    >
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <rect x="3" y="3" width="7" height="7"></rect>
+                                            <rect x="14" y="3" width="7" height="7"></rect>
+                                            <rect x="3" y="14" width="7" height="7"></rect>
+                                            <rect x="14" y="14" width="7" height="7"></rect>
+                                        </svg>
+                                        <span>QRIS</span>
+                                    </button>
                                 </div>
+                            </div>
 
-                                <!-- Smart Denomination Pills -->
-                                <div class="grid grid-cols-4 gap-1.5">
-                                    <template x-for="amt in quickCashOptions" :key="amt">
+                            <!-- Tunai Cash Input & Smart Denominations -->
+                            <template x-if="paymentMethod === 'tunai'">
+                                <div class="space-y-2.5 pt-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <label class="text-xs font-medium text-ink-subtle" for="uang-diterima">Uang Diterima</label>
                                         <button
                                             type="button"
-                                            @click="paidAmount = amt"
-                                            :class="paidAmount === amt ? 'bg-primary text-on-primary font-bold' : 'bg-surface-1 hover:bg-surface-3 text-ink font-medium'"
-                                            class="py-2 min-h-[40px] text-xs rounded-lg border border-hairline transition-all focus-ring cursor-pointer font-mono text-center"
-                                            x-text="formatShortMoney(amt)"
-                                        ></button>
-                                    </template>
-                                </div>
-
-                                <!-- Prominent High-Contrast Kembalian Callout -->
-                                <div
-                                    class="p-2.5 rounded-xl border transition-all"
-                                    :class="paidAmount >= total ? 'bg-success/10 border-success/40' : 'bg-danger/10 border-danger/40'"
-                                    role="status"
-                                    aria-live="polite"
-                                >
-                                    <div class="flex items-center justify-between text-xs font-semibold mb-1 text-ink-subtle">
-                                        <span x-text="paidAmount >= total ? 'UANG KEMBALIAN' : 'SISA KURANG BAYAR'"></span>
-                                        <span x-text="paidAmount >= total ? 'Kembalikan ke pelanggan' : 'Belum lunas'"></span>
+                                            @click="paidAmount = total"
+                                            class="bg-surface-1 hover:bg-surface-3 border border-hairline text-primary hover:text-primary-hover text-xs font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                                        >Uang Pas</button>
                                     </div>
-                                    <div
-                                        class="text-2xl sm:text-3xl font-mono font-black tracking-tight leading-none"
-                                        :class="paidAmount >= total ? 'text-success' : 'text-danger'"
-                                        x-text="paidAmount >= total ? formatMoney(change) : '- ' + formatMoney(total - paidAmount)"
-                                    ></div>
-                                </div>
-                            </div>
-                        </template>
 
-                        <!-- STEP 3B: QRIS GUIDANCE CARD -->
-                        <template x-if="paymentMethod === 'qris'">
-                            <div class="space-y-2 bg-surface-2/60 p-3.5 rounded-xl border border-hairline">
-                                <div class="flex items-center gap-2 text-xs font-bold text-ink">
-                                    <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                    <span>Pembayaran QRIS Statis</span>
-                                </div>
-                                <p class="text-xs text-ink-subtle leading-relaxed">
-                                    Minta pelanggan memindai kode QRIS toko senilai <span class="font-mono font-bold text-ink" x-text="formatMoney(total)"></span>. Pastikan notifikasi penerimaan dana muncul sebelum klik bayar.
-                                </p>
-                                <button
-                                    type="button"
-                                    @click="qrisVisible = true"
-                                    class="w-full bg-surface-1 hover:bg-surface-3 border border-primary text-ink font-bold text-xs rounded-lg min-h-[40px] flex items-center justify-center gap-2 transition-colors focus-ring cursor-pointer"
-                                >
-                                    <span class="text-secondary">Tampilkan Kode QRIS</span>
-                                </button>
-                            </div>
-                        </template>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle">Rp</span>
+                                        <input
+                                            id="uang-diterima"
+                                            type="number"
+                                            inputmode="numeric"
+                                            x-ref="cashInput"
+                                            x-model.number="paidAmount"
+                                            min="0"
+                                            placeholder="0"
+                                            class="w-full min-h-[42px] bg-surface-1 border border-hairline rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base font-bold text-ink focus:outline-none focus:border-primary transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+                                        >
+                                    </div>
 
-                        <!-- STEP 4: NOTES (Optional) -->
+                                    <!-- Quick Cash Pills (Font Global - Bukan Mono) -->
+                                    <div class="grid grid-cols-4 gap-1.5">
+                                        <template x-for="amt in quickCashOptions" :key="amt">
+                                            <button
+                                                type="button"
+                                                @click="paidAmount = amt"
+                                                :class="paidAmount === amt ? 'bg-primary text-on-primary font-bold' : 'bg-surface-1 hover:bg-surface-3 text-ink font-medium'"
+                                                class="py-1.5 text-xs rounded-lg border border-hairline transition-all cursor-pointer text-center font-sans"
+                                                x-text="formatShortMoney(amt)"
+                                            ></button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- QRIS Guidance -->
+                            <template x-if="paymentMethod === 'qris'">
+                                <div class="pt-1 flex items-center justify-between gap-2">
+                                    <p class="text-xs text-ink-subtle">Pindai QRIS senilai <span class="font-bold text-ink" x-text="formatMoney(total)"></span></p>
+                                    <button
+                                        type="button"
+                                        @click="qrisVisible = true"
+                                        class="shrink-0 bg-surface-1 hover:bg-surface-3 border border-primary/40 text-primary font-bold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                    >Lihat QRIS</button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- CATATAN TRANSAKSI -->
                         <div>
                             <label for="catatan-transaksi" class="sr-only">Catatan transaksi</label>
                             <input
@@ -512,30 +539,65 @@
                                 type="text"
                                 x-model="note"
                                 placeholder="Catatan transaksi (opsional, nama pembeli / alamat)..."
-                                class="w-full min-h-[40px] bg-surface-2 border border-hairline rounded-xl px-3 py-2.5 text-xs text-ink placeholder:text-ink-subtle focus:outline-none focus:border-primary"
+                                class="w-full min-h-[40px] bg-surface-2/60 border border-hairline rounded-xl px-3 py-2.5 text-xs text-ink placeholder:text-ink-subtle focus:outline-none focus:border-primary"
                             >
                         </div>
 
-                        <!-- STEP 5: FINAL CHECKOUT ACTION (pinned to panel bottom on desktop) -->
-                        <div class="mt-3 lg:sticky lg:bottom-0 lg:z-10 lg:bg-surface-1 lg:pt-2 lg:pb-4 sm:lg:pb-5 lg:shadow-[0_-10px_16px_-12px_rgba(0,0,0,0.55)]">
+                        <!-- SUMMARY CARD: TOTAL HARGA & UANG KEMBALIAN (LAYOUT SESUAI GAMBAR REFERENSI) -->
+                        <div class="rounded-2xl border border-hairline bg-surface-2/60 p-4 space-y-2.5">
+                            <!-- Sub-Total -->
+                            <div class="flex items-center justify-between text-xs sm:text-sm">
+                                <span class="text-ink-subtle">Sub-Total</span>
+                                <span class="font-semibold text-ink" x-text="formatMoney(total)"></span>
+                            </div>
+
+                            <!-- Uang Diterima (Khusus Tunai) -->
+                            <template x-if="paymentMethod === 'tunai'">
+                                <div class="flex items-center justify-between text-xs sm:text-sm">
+                                    <span class="text-ink-subtle">Uang Diterima</span>
+                                    <span class="font-semibold text-ink" x-text="formatMoney(paidAmount)"></span>
+                                </div>
+                            </template>
+
+                            <!-- Divider Line -->
+                            <div class="border-t border-hairline my-1.5"></div>
+
+                            <!-- Bottom Row: Uang Kembalian / Total Pembayaran -->
+                            <template x-if="paymentMethod === 'tunai'">
+                                <div class="flex items-center justify-between text-sm sm:text-base">
+                                    <span class="font-semibold" :class="paidAmount >= total ? 'text-ink' : 'text-danger'" x-text="paidAmount >= total ? 'Uang Kembalian' : 'Sisa Kurang Bayar'"></span>
+                                    <span class="font-bold text-base sm:text-lg" :class="paidAmount >= total ? 'text-success' : 'text-danger'" x-text="paidAmount >= total ? formatMoney(change) : '- ' + formatMoney(total - paidAmount)"></span>
+                                </div>
+                            </template>
+
+                            <template x-if="paymentMethod !== 'tunai'">
+                                <div class="flex items-center justify-between text-sm sm:text-base">
+                                    <span class="font-semibold text-ink">Total Pembayaran</span>
+                                    <span class="font-bold text-base sm:text-lg text-ink" x-text="formatMoney(total)"></span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- CHECKOUT ACTION BUTTON (Layout sesuai gambar referensi: pill/rounded-2xl button) -->
+                        <div class="mt-3 lg:sticky lg:bottom-0 lg:z-10 lg:bg-surface-1 lg:pt-2 lg:pb-4 sm:lg:pb-5">
                             <button
                                 type="button"
                                 @click="saveTransaction()"
                                 :disabled="cartItems.length === 0 || loading || (paymentMethod === 'tunai' && paidAmount < total)"
-                                class="w-full bg-primary hover:bg-primary-hover active:bg-primary-focus disabled:bg-surface-2 disabled:text-ink-subtle disabled:cursor-not-allowed text-on-primary font-bold text-sm rounded-xl py-3.5 min-h-[48px] shadow-sm transition-all duration-150 focus-ring flex items-center justify-center gap-2 cursor-pointer"
+                                class="w-full bg-primary hover:brightness-105 active:brightness-95 disabled:bg-surface-2 disabled:text-ink-subtle disabled:cursor-not-allowed text-on-primary font-bold text-sm sm:text-base rounded-2xl py-3.5 min-h-[50px] shadow-sm transition-all duration-150 focus-ring flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <template x-if="loading">
-                                    <svg class="animate-spin h-4 w-4 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg class="animate-spin h-5 w-5 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                                     </svg>
                                 </template>
                                 <template x-if="!loading">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <svg class="w-5 h-5 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                 </template>
-                                <span x-text="loading ? 'Memproses Transaksi...' : (cartItems.length === 0 ? 'Keranjang Kosong' : 'Selesaikan Pembayaran (' + formatMoney(total) + ')')"></span>
+                                <span x-text="loading ? 'Memproses Transaksi...' : (cartItems.length === 0 ? 'Keranjang Kosong' : (isCustomDate ? 'Simpan Transaksi Lawas (' + formatMoney(total) + ')' : 'Selesaikan Pembayaran (' + formatMoney(total) + ')'))"></span>
                             </button>
                         </div>
                     </div>
@@ -700,6 +762,9 @@
                 paymentMethod: 'tunai',
                 paidAmount: 0,
                 note: '',
+                isCustomDate: false,
+                customDate: '{{ now()->toDateString() }}',
+                todayDate: '{{ now()->toDateString() }}',
                 loading: false,
                 receiptVisible: false,
                 qrisVisible: false,
@@ -813,6 +878,27 @@
                     return new Date(value).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
                 },
 
+                toggleCustomDate() {
+                    this.isCustomDate = !this.isCustomDate;
+                    if (this.isCustomDate && !this.customDate) {
+                        this.customDate = this.todayDate;
+                    }
+                },
+
+                formatSelectedDate(value) {
+                    if (!value) return '-';
+                    try {
+                        const parts = value.split('-');
+                        if (parts.length === 3) {
+                            const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                            return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                        }
+                        return value;
+                    } catch (e) {
+                        return value;
+                    }
+                },
+
                 handleGlobalKey(e) {
                     // Ignore when inside inputs
                     const tag = e.target.tagName.toLowerCase();
@@ -909,6 +995,8 @@
                     this.cartItems = [];
                     this.paidAmount = 0;
                     this.note = '';
+                    this.isCustomDate = false;
+                    this.customDate = this.todayDate;
                     this.showToast('Keranjang belanja berhasil dikosongkan.', 'info', 'Keranjang Bersih');
                 },
 
@@ -936,6 +1024,8 @@
                                 payment_method: this.paymentMethod,
                                 paid_amount: this.paymentMethod === 'tunai' ? this.paidAmount : this.total,
                                 note: this.note || null,
+                                is_custom_date: this.isCustomDate,
+                                transaction_date: this.isCustomDate ? this.customDate : null,
                             }),
                         });
 
